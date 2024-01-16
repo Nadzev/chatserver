@@ -39,7 +39,7 @@ async def disconnect(sid):
 
 @sio.event
 async def update_sid(sid, data):
-    await UserService.update_sid(sid, data)
+    await UserService.update_sid(data, sid)
     
 @sio.event
 async def message(sid, data):
