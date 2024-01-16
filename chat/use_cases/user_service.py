@@ -42,6 +42,9 @@ class UserService:
     async def update_sid(cls, username, sid):
         UserRepository.update_sid(username, sid)
 
+    @classmethod
+    async def update_public_key(cls, user_id, public_key):
+        UserRepository.update_public_key(user_id, public_key)
 
     @classmethod
     async def list_users(cls) -> List[dict]:

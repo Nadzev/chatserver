@@ -1,8 +1,6 @@
 from chat.infra.repositories.user_repository import UserRepository
 from chat.infra.repositories.session_repository import SessionRepository
-from chat.use_cases.messages_protection import RSAHandler, CamelliaMessageHandler
 from chat.domain.entities.session import Message
-from Crypto.Random import get_random_bytes
 from chat.domain.entities.session import Session
 from datetime import datetime
 import uuid
@@ -18,13 +16,6 @@ class SessionHandler:
         session = Session(users=users, session_id=session_id)
 
         SessionRepository.add_session(session)
-
-    @classmethod
-    async def generate_keys(cls):
-        user_private_key, other_public_key = RSAHandler.generate_rsa_keys()
-        symmetric_key = get_random_bytes(32)
-        encrypted_key = RSAHandler.rsa_encrypt(other_public_key, symmetric_key)
-        return user_private_key, encrypted_key, symmetric_key
 
     @classmethod
     async def get_message(cls, data, sid=None):
