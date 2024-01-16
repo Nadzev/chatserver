@@ -7,11 +7,7 @@ class UserService:
     async def save(cls, user):
         user = user.dict()
         user["id_"] = str(user.get("id_"))
-        # public_key_dict = user.get("public_key")
-        # public_key = public_key_dict.get("n")
-        # user["public_key"] = public_key
         if UserRepository.get_user_by_username(user.get("username")):
-            # del user['_id']
             return user
 
         UserRepository.add_user(user)
@@ -46,20 +42,6 @@ class UserService:
     async def update_sid(cls, username, sid):
         UserRepository.update_sid(username, sid)
 
-    # @classmethod
-    # async def list_users(cls):
-    #     users = UserRepository.list_users()
-    #     users = list(users)
-    #     print("list total de usuários")
-    #     print(users)
-    #     converted_users = []
-    #     for user in users:
-    #         del user["_id"]
-    #         converted_users.append(user)
-
-    #     # print('listing users...')
-    #     # print(users)
-    #     return converted_users
 
     @classmethod
     async def list_users(cls) -> List[dict]:
@@ -70,9 +52,7 @@ class UserService:
 
         converted_users = [cls.remove_id_field(user) for user in users]
         print(converted_users)
-        # If you want to print the converted users, uncomment the following lines:
-        # print('Listing users...')
-        # print(converted_users)
+     
 
         return converted_users
 
