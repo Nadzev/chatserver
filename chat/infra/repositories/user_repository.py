@@ -37,13 +37,14 @@ class UserRepository(UserRepositoryInterface):
         cls.collection.update_one({"username": username}, {"$set": {"sid": sid}})
     
     @classmethod
-    def update_public_key(cls, user_id, public_key):
-        cls.collection.update_one({"user_id": user_id}, {"$set": {"public_key": public_key}})
+    def update_public_key(cls, user_id, public_key, sid):
+        cls.collection.update_one({"id_": user_id}, {"$set": {"public_key": public_key}})
+        cls.collection.update_one({"id_": user_id}, {"$set": {"sid": sid}})
 
 
     @classmethod
     def delete_user(cls, user_id):
-        cls.collection.delete_one({"_id": user_id})
+        cls.collection.delete_one({"id_": user_id})
 
 
 #

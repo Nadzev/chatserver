@@ -13,7 +13,5 @@ class User(BaseModel):
 
 class UpdatePublicKey(BaseModel):
     user_id: str
-    public_key: str
-
-class UsersStorage:
-    users = {}
+    public_key: Dict
+    sid: str
