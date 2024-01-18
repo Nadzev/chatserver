@@ -36,7 +36,8 @@ class UserService:
     async def get_receipient_public_key(cls, user_id):
         user = UserRepository.get_user_by_id(user_id)
         public_key = user.get("public_key")
-        return public_key
+        del user['_id']
+        return user
 
     @classmethod
     async def update_sid(cls, username, sid):

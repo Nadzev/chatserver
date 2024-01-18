@@ -37,6 +37,9 @@ async def update_public_key(update_public_key: UpdatePublicKey):
 
 @router.get("/history/{session_id}")
 async def get_history(session_id: str):
-    return await SessionHandler.get_history(session_id)
+    history = await SessionHandler.get_history(session_id)
+    print("history")
+    print(history)
+    return history
 
 

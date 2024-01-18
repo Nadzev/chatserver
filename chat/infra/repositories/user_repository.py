@@ -1,10 +1,8 @@
 from chat.domain.repositories.user_repository import UserRepositoryInterface
 from chat.domain.entities.users import User
 import os
-
-
 from pymongo import MongoClient
-import os
+
 
 
 class UserRepository(UserRepositoryInterface):
@@ -40,7 +38,6 @@ class UserRepository(UserRepositoryInterface):
     def update_public_key(cls, user_id, public_key, sid):
         cls.collection.update_one({"id_": user_id}, {"$set": {"public_key": public_key}})
         cls.collection.update_one({"id_": user_id}, {"$set": {"sid": sid}})
-
 
     @classmethod
     def delete_user(cls, user_id):

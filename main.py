@@ -46,7 +46,9 @@ async def update_sid(sid, data):
 @sio.event
 async def message(sid, data):
     # data should contain 'recipient_id' and 'text
+    print(data)
     message = await SessionHandler.get_message(data, sid)
+
     recipient = str(data["to"])
     receiver_sid = await SessionHandler.get_sid_user(recipient)
     await SessionHandler.add_message(data)

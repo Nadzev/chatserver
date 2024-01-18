@@ -12,6 +12,15 @@ services:
     
     ports:
     - "27019:27017"
+
+  chat-server:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file: 
+      - .env
+    volumes:
+      - .:/usr/src/app
   
     
    
