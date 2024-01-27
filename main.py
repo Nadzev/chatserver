@@ -11,7 +11,7 @@ from chat.ui.routes import router
 import binascii
 import time
 
-sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=["http://localhost:3000"])
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 app = FastAPI()
 app.include_router(router)
 app.add_middleware(
@@ -31,8 +31,7 @@ async def connect(sid, *args):
     await sio.emit("getSid", sid, to=sid)
     users = await UserService.list_users()
     await sio.emit("usersList", users)
-    print('Sending users')
-    print(users)
+  
 
 
 @sio.event
@@ -48,7 +47,6 @@ async def message(sid, data):
     # data should contain 'recipient_id' and 'text
     print(data)
     message = await SessionHandler.get_message(data, sid)
-
     recipient = str(data["to"])
     receiver_sid = await SessionHandler.get_sid_user(recipient)
     await SessionHandler.add_message(data)

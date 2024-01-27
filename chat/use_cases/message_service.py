@@ -36,7 +36,7 @@ class SessionHandler:
 
     @classmethod
     async def add_message(cls, data):
-        text = data["text"]
+        text = str(data["text"])
         sender = str(data["from"])
         recipient = str(data["to"])
         session_id = str(data["session_id"])
