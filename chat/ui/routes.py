@@ -6,8 +6,12 @@ from chat.domain.entities.users import User
 from chat.dtos.user import UserLogin, UpdatePublicKey
 from chat.service.message_service import SessionHandler
 from chat.service.user_service import UserService
-from chat.domain.entities.group import Group  # Make sure this is defined as per your domain model
-from chat.service.group_service import GroupService  # Assuming GroupService is implemented as discussed
+from chat.domain.entities.group import (
+    Group,
+)  # Make sure this is defined as per your domain model
+from chat.service.group_service import (
+    GroupService,
+)  # Assuming GroupService is implemented as discussed
 from typing import List
 from chat.dtos.group import GroupCreateRequest
 
@@ -24,7 +28,7 @@ async def register_user(user: User):
 
 @router.get("/public-key/{user_id}")
 async def get_pk(user_id: str):
-    print('Getting public key')
+    print("Getting public key")
     return await UserService.get_receipient_public_key(user_id)
 
 
@@ -50,11 +54,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = UserLogin(username, password)
     return await UserService.login(user)
 
+
 @router.put("/")
 async def update_sid(sid: str, username):
     await UserService.update_sid(username, sid)
-
-
 
 
 @router.post("/groups", response_model=Group, status_code=status.HTTP_201_CREATED)
@@ -68,7 +71,7 @@ async def create_group(group_create_request: GroupCreateRequest):
     try:
         new_group = await GroupService.create_group(
             group_name=group_create_request.group_name,
-            members=group_create_request.members
+            members=group_create_request.members,
         )
         return new_group
     except Exception as e:

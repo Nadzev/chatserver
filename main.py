@@ -12,6 +12,7 @@ from chat.domain.entities.session import Message, Session
 from chat.ui.routes import router
 from chat.service.message_service import SessionHandler
 from chat.service.user_service import UserService
+from chat.service.group_service import GroupService
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 app = FastAPI()
@@ -56,3 +57,31 @@ async def message(sid, data):
     print("Sending message to " + receiver_sid)
     await sio.emit("clientMessage", [message], to=receiver_sid)
     print("Message sent to " + receiver_sid)
+
+
+@sio.event
+async def create_group(sid, data):
+    group_name = data['group_name']
+    members = data['members']
+    group_id = data['group_id']  # List of member user IDs
+    try:
+        new_group = await GroupService.create_group(group_id=group_id, group_name=group_name, members=members)
+        await sio.emit('group_created', new_group, room=sid) 
+        
+    except Exception as e:
+        await sio.emit('error', {'message': str(e)}, room=sid)
+
+@sio.event
+async def joinGroup(sid, data):
+    group_id = data['group_id']
+    await sio.enter_room(sid, room=group_id)
+    print(f"Socket {sid} joined group {group_id}")
+
+
+@sio.event
+async def sendGroupMessage(sid, data):
+    group_id = data['group_id']
+    message = data['message']
+    # You might want to store the message in the database here
+    await sio.emit('groupMessage', message, room=group_id)
+    print(f"Message sent to group {group_id}: {message}")

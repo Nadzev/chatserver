@@ -32,7 +32,7 @@ class SessionHandler:
             "recipient_sid": sid,
             "sender": sender,
             "session_id": session_id,
-            "sender_key": sender_key
+            "sender_key": sender_key,
         }
 
     @classmethod
@@ -50,7 +50,11 @@ class SessionHandler:
 
         timestamp = datetime.now()
         new_message = Message(
-            text=text, sender=sender, timestamp=timestamp, key=key, sender_key=sender_key
+            text=text,
+            sender=sender,
+            timestamp=timestamp,
+            key=key,
+            sender_key=sender_key,
         ).dict()
         SessionRepository.add_message(message=new_message, session_id=session_id)
         return new_message

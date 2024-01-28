@@ -11,6 +11,7 @@ from chat.infra.repositories.user_repository import UserRepository
 from chat.settings.authentication_settings import AuthenticationSettings
 from chat.utils.authentication import create_access_token, decode_access_token
 
+
 class UserService:
     @classmethod
     async def get_current_user(

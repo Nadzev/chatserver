@@ -5,6 +5,7 @@ from typing import List
 # Assuming a Group domain entity exists similar to the User entity
 from chat.domain.entities.group import Group
 
+
 class GroupRepository:
     db_url = os.getenv("DATABASE_URL")
     db_name = "chat-redes"  # Use your actual database name
@@ -33,14 +34,18 @@ class GroupRepository:
         """
         Add a new member to the specified group.
         """
-        cls.collection.update_one({"group_id": group_id}, {"$addToSet": {"members": user_id}})
+        cls.collection.update_one(
+            {"group_id": group_id}, {"$addToSet": {"members": user_id}}
+        )
 
     @classmethod
     def remove_member_from_group(cls, group_id: str, user_id: str):
         """
         Remove a member from the specified group.
         """
-        cls.collection.update_one({"group_id": group_id}, {"$pull": {"members": user_id}})
+        cls.collection.update_one(
+            {"group_id": group_id}, {"$pull": {"members": user_id}}
+        )
 
     @classmethod
     def list_groups(cls) -> List[Group]:
@@ -61,4 +66,6 @@ class GroupRepository:
         """
         Update the name of a specified group.
         """
-        cls.collection.update_one({"group_id": group_id}, {"$set": {"group_name": new_name}})
+        cls.collection.update_one(
+            {"group_id": group_id}, {"$set": {"group_name": new_name}}
+        )

@@ -1,10 +1,13 @@
 from typing import List
 from chat.domain.entities.group import Group  # Ensure you have a Group entity defined
-from chat.infra.repositories.group_repository import GroupRepository  # Assuming the existence of GroupRepository
+from chat.infra.repositories.group_repository import (
+    GroupRepository,
+)  # Assuming the existence of GroupRepository
+
 
 class GroupService:
     @classmethod
-    async def create_group(cls, group_name: str, members: List[str]) -> Group:
+    async def create_group(cls,group_id:str, group_name: str, members: List[str]) -> Group:
         """
         Create a new group with the specified name and members.
 
@@ -13,7 +16,7 @@ class GroupService:
         :return: The created Group object.
         """
         # Generate a unique ID for the group (or you can do this inside the GroupRepository)
-        group_id = str(uuid.uuid4())
+        # group_id = str(uuid.uuid4())
         group = Group(group_id=group_id, group_name=group_name, members=members)
         GroupRepository.create_group(group)
         return group
