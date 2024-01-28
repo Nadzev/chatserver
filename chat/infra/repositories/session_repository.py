@@ -1,11 +1,9 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from chat.domain.repositories.user_repository import UserRepositoryInterface
-from chat.domain.entities.users import User
 import os
-
 
 from pymongo import MongoClient
-import os
+
+from chat.domain.entities.users import User
+from chat.domain.repositories.user_repository import UserRepositoryInterface
 
 
 class SessionRepository(UserRepositoryInterface):

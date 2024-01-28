@@ -1,5 +1,7 @@
-from chat.use_cases.messages_protection import RSAHandler, CamelliaMessageHandler
 from Crypto.Random import get_random_bytes
+
+from chat.use_cases.messages_protection import (CamelliaMessageHandler,
+                                                RSAHandler)
 
 # Example Usage
 alice_private, alice_public = RSAHandler.generate_rsa_keys()

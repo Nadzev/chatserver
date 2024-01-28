@@ -1,5 +1,6 @@
-import socketio
 import asyncio
+
+import socketio
 
 print("oiiiiiiiiiiiiiiiii")
 sio = socketio.AsyncClient()

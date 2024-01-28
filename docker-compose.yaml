@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  chat-redes:
+  chat-redes-db:
     image: mongo
     container_name: chat-redes
     restart: always
@@ -13,14 +13,14 @@ services:
     ports:
     - "27019:27017"
 
-  chat-server:
-    build: .
-    ports:
-      - "8000:8000"
-    env_file: 
-      - .env
-    volumes:
-      - .:/usr/src/app
+  # chat-server:
+  #   build: .
+  #   ports:
+  #     - "8000:8000"
+  #   env_file: 
+  #     - .env
+  #   volumes:
+  #     - .:/usr/src/app
   
     
    

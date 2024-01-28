@@ -1,9 +1,9 @@
-import socketio
 import asyncio
 import ssl
-import requests
-import aiohttp
 
+import aiohttp
+import requests
+import socketio
 
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False

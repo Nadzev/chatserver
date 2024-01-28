@@ -1,13 +1,15 @@
-from pydantic import BaseModel, Field
-from typing import List, Union, Dict
-from uuid import UUID, uuid4
 from datetime import datetime
+from typing import Dict, List, Union
+from uuid import UUID, uuid4
+
+from pydantic import BaseModel, Field
 
 
 class Message(BaseModel):
     text: str
     sender: str
     key: str
+    sender_key: str
 
 
 class Session(BaseModel):

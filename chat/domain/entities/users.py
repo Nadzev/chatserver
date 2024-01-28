@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
-from uuid import UUID
+from typing import Dict, Optional, Union
 from uuid import UUID, uuid4
-from typing import Union, Dict, Optional
+
+from pydantic import BaseModel, Field
 
 
 class User(BaseModel):
@@ -10,6 +10,7 @@ class User(BaseModel):
     public_key: Union[str, Dict] = None
     username: str
     password: str
+
 
 class UpdatePublicKey(BaseModel):
     user_id: str

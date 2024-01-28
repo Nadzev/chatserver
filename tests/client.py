@@ -1,6 +1,7 @@
 import asyncio
-import socketio
 import time
+
+import socketio
 
 sio = socketio.AsyncClient()
 sio2 = socketio.AsyncClient()

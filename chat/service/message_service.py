@@ -1,9 +1,9 @@
-from chat.infra.repositories.user_repository import UserRepository
-from chat.infra.repositories.session_repository import SessionRepository
-from chat.domain.entities.session import Message
-from chat.domain.entities.session import Session
-from datetime import datetime
 import uuid
+from datetime import datetime
+
+from chat.domain.entities.session import Message, Session
+from chat.infra.repositories.session_repository import SessionRepository
+from chat.infra.repositories.user_repository import UserRepository
 
 
 class SessionHandler:
@@ -23,15 +23,16 @@ class SessionHandler:
         text = data.get("text")
         key = data.get("key")
         sender = str(data["from"])
-        session_id = data["session_id"]
-        print("Simmetric key")
-        print(key)
+        session_id = data.get("session_id")
+        sender_key = data.get("sender_key")
+
         return {
             "text": text,
             "key": key,
             "recipient_sid": sid,
             "sender": sender,
             "session_id": session_id,
+            "sender_key": sender_key
         }
 
     @classmethod
@@ -40,6 +41,7 @@ class SessionHandler:
         sender = str(data["from"])
         recipient = str(data["to"])
         session_id = str(data["session_id"])
+        sender_key = str(data["sender_key"])
         key = data["key"]
         if SessionRepository.get_session_by_id(session_id) is None:
             users = [sender, recipient]
@@ -48,7 +50,7 @@ class SessionHandler:
 
         timestamp = datetime.now()
         new_message = Message(
-            text=text, sender=sender, timestamp=timestamp, key=key
+            text=text, sender=sender, timestamp=timestamp, key=key, sender_key=sender_key
         ).dict()
         SessionRepository.add_message(message=new_message, session_id=session_id)
         return new_message
@@ -58,7 +60,6 @@ class SessionHandler:
         session = SessionRepository.get_session_by_id(session_id)
         if session is None:
             return []
-        print(session)
         return session["messages"]
 
     @classmethod
