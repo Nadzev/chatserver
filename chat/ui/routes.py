@@ -22,7 +22,6 @@ router = APIRouter()
 @router.post("/register")
 async def register_user(user: User):
     user = await UserService.save(user)
-    print(User)
     return user
 
 
@@ -68,11 +67,11 @@ async def create_group(group_create_request: GroupCreateRequest):
     - **group_name**: each group must have a name
     - **members**: list of user IDs to be included in the group
     """
-    try:
-        new_group = await GroupService.create_group(
-            group_name=group_create_request.group_name,
-            members=group_create_request.members,
-        )
-        return new_group
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    print("Creating group %s")
+    new_group = await GroupService.create_group(group_name=group_create_request.group_name, members=group_create_request.members, session_id=group_create_request.session_id)
+    return new_group
+
+@router.get("/group-public-keys/{group_id}")
+async def get_public_keys_from_group(group_id: str):
+    return await GroupService.get_public_keys(group_id)
+

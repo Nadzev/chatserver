@@ -10,6 +10,7 @@ class User(BaseModel):
     public_key: Union[str, Dict] = None
     username: str
     password: str
+    type: str = 'user'
 
 
 class UpdatePublicKey(BaseModel):

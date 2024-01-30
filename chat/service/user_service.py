@@ -65,6 +65,7 @@ class UserService:
 
     @classmethod
     async def get_receipient_public_key(cls, user_id):
+        print(user_id)
         user = UserRepository.get_user_by_id(user_id)
         public_key = user.get("public_key")
         del user["_id"]

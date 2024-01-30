@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from chat.domain.entities.session import Message, Session
+from chat.domain.entities.session import Message, Session, GroupMessage
 from chat.infra.repositories.session_repository import SessionRepository
 from chat.infra.repositories.user_repository import UserRepository
 
@@ -12,10 +12,15 @@ class SessionHandler:
         return str(uuid.uuid4())
 
     @classmethod
-    async def create_session(cls, users, session_id):
-        session = Session(users=users, session_id=session_id)
-
+    async def create_session(cls, users, session_id, type):
+        session = Session(users=users, session_id=session_id, type=type)
         SessionRepository.add_session(session)
+
+    @classmethod
+    async def create_group_session(cls, members, session_id, type):
+        session = Session(users=members, session_id=session_id, type=type)
+        SessionRepository.add_session(session)
+
 
     @classmethod
     async def get_message(cls, data, sid=None):
@@ -36,6 +41,32 @@ class SessionHandler:
         }
 
     @classmethod
+    async def add_group_message(cls, data):
+        text = str(data["text"])
+        sender = str(data["from"])
+        recipient = str(data["to"])
+        session_id = str(data["session_id"])
+        sender_key = str(data["sender_key"])
+        key = data["key"]
+        type = data['type']
+        if SessionRepository.get_session_by_id(session_id) is None:
+            # users = [sender, recipient]
+            # print(users)
+            await cls.create_session(users, session_id,type=type)
+
+        timestamp = datetime.now()
+        new_message = GroupMessage(
+            text=text,
+            sender=sender,
+            timestamp=timestamp,
+            key=key,
+            sender_key=sender_key,
+        ).dict()
+        SessionRepository.add_message(message=new_message, session_id=session_id)
+        return new_message
+
+
+    @classmethod
     async def add_message(cls, data):
         text = str(data["text"])
         sender = str(data["from"])
@@ -43,10 +74,11 @@ class SessionHandler:
         session_id = str(data["session_id"])
         sender_key = str(data["sender_key"])
         key = data["key"]
+        type = data['type']
         if SessionRepository.get_session_by_id(session_id) is None:
             users = [sender, recipient]
             print(users)
-            await cls.create_session(users, session_id)
+            await cls.create_session(users, session_id,type=type)
 
         timestamp = datetime.now()
         new_message = Message(

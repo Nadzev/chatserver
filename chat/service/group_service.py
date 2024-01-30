@@ -3,11 +3,11 @@ from chat.domain.entities.group import Group  # Ensure you have a Group entity d
 from chat.infra.repositories.group_repository import (
     GroupRepository,
 )  # Assuming the existence of GroupRepository
-
+from chat.infra.repositories.user_repository import UserRepository
 
 class GroupService:
     @classmethod
-    async def create_group(cls,group_id:str, group_name: str, members: List[str]) -> Group:
+    async def create_group(cls,group_name: str, members: List[str], session_id) -> Group:
         """
         Create a new group with the specified name and members.
 
@@ -17,9 +17,27 @@ class GroupService:
         """
         # Generate a unique ID for the group (or you can do this inside the GroupRepository)
         # group_id = str(uuid.uuid4())
-        group = Group(group_id=group_id, group_name=group_name, members=members)
+        group = Group(username=group_name, members=members, session_id=session_id)
+        group.id_ = str(group.id_)
         GroupRepository.create_group(group)
-        return group
+        
+        return group.dict()
+    
+    @classmethod
+    async def get_public_keys(cls, group_id: str):
+        group = cls.get_group(group_id)
+        members = group['members']
+        pair_members = {}
+        pair_members['group_id'] = group_id
+        pair_members['keys'] = {}
+        for member in members:
+            user = await UserRepository.get_user_by_id(member)
+            public_key = user['public_key']
+            pair_members['keys'][user] = public_key
+
+        return pair_members
+
+
 
     @classmethod
     async def add_member(cls, group_id: str, user_id: str) -> None:
@@ -58,7 +76,20 @@ class GroupService:
 
         :return: A list of all Group objects.
         """
-        return GroupRepository.list_groups()
+        groups = GroupRepository.list_groups()
+        converted_users = [cls.remove_id_field(group) for group in groups]
+
+        return converted_users
+    
+
+    @staticmethod
+    def remove_id_field(user: dict) -> dict:
+        """
+        Remove the "_id" field from the user dictionary.
+        """
+        user_without_id = user.copy()
+        user_without_id.pop("_id", None)
+        return user_without_id
 
     @classmethod
     async def delete_group(cls, group_id: str) -> None:
