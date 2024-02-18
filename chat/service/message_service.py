@@ -4,7 +4,8 @@ from datetime import datetime
 from chat.domain.entities.session import Message, Session, GroupMessage
 from chat.infra.repositories.session_repository import SessionRepository
 from chat.infra.repositories.user_repository import UserRepository
-
+from chat.infra.repositories.group_repository import GroupRepository
+from chat.service.message_service import Message
 
 class SessionHandler:
     @classmethod
@@ -24,43 +25,43 @@ class SessionHandler:
 
     @classmethod
     async def get_message(cls, data, sid=None):
-        # recipient_id = data.get("recipient_id")
         text = data.get("text")
         key = data.get("key")
         sender = str(data["from"])
         session_id = data.get("session_id")
         sender_key = data.get("sender_key")
+        message = Message(text=text, sender=sender, sender_key=sender_key, key=key, session_id=session_id, recipient_sid=sid)
 
-        return {
-            "text": text,
-            "key": key,
-            "recipient_sid": sid,
-            "sender": sender,
-            "session_id": session_id,
-            "sender_key": sender_key,
-        }
-
+        return message.dict()
     @classmethod
     async def add_group_message(cls, data):
+        print(data)
         text = str(data["text"])
         sender = str(data["from"])
         recipient = str(data["to"])
         session_id = str(data["session_id"])
         sender_key = str(data["sender_key"])
-        key = data["key"]
+        criptographited_keys = data["keys"]
+        print("######received keys#######")
+        print(criptographited_keys)
         type = data['type']
+        group_id = data['group_id']
+        group = GroupRepository.get_group_by_id(group_id)
+        members = group['members']
+       
         if SessionRepository.get_session_by_id(session_id) is None:
-            # users = [sender, recipient]
-            # print(users)
-            await cls.create_session(users, session_id,type=type)
+            await cls.create_session(members, session_id,type=type)
 
         timestamp = datetime.now()
         new_message = GroupMessage(
             text=text,
             sender=sender,
             timestamp=timestamp,
-            key=key,
             sender_key=sender_key,
+            keys=criptographited_keys,
+            receivers=members
+
+
         ).dict()
         SessionRepository.add_message(message=new_message, session_id=session_id)
         return new_message
@@ -75,9 +76,10 @@ class SessionHandler:
         sender_key = str(data["sender_key"])
         key = data["key"]
         type = data['type']
-        if SessionRepository.get_session_by_id(session_id) is None:
-            users = [sender, recipient]
-            print(users)
+        users = [sender, recipient]
+
+        if SessionRepository.verify_if_exists(users) is None:
+           
             await cls.create_session(users, session_id,type=type)
 
         timestamp = datetime.now()
@@ -94,15 +96,13 @@ class SessionHandler:
     @classmethod
     async def get_history(cls, session_id: str):
         session = SessionRepository.get_session_by_id(session_id)
+        
         if session is None:
             return []
         return session["messages"]
-
+    
     @classmethod
     async def get_sid_user(cls, user_id):
-        print("Getting user")
-        print(user_id)
-        # user_id = user_id['id_']
         user = UserRepository.get_user_by_id(user_id)
         return user["sid"]
 

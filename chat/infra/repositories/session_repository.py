@@ -18,6 +18,10 @@ class SessionRepository(UserRepositoryInterface):
     def get_session_by_id(cls, session_id):
         session = cls.collection.find_one({"session_id": session_id})
         return session
+    
+    @classmethod
+    def verify_if_exists(cls, users):
+        cls.collection.find_one({"users": users})
 
     @classmethod
     def add_message(cls, session_id, message):

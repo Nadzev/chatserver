@@ -16,7 +16,7 @@ class Message(BaseModel):
 class GroupMessage(BaseModel):
     text: str
     sender: str
-    receivers: str
+    receivers: List[str]
     keys: Dict
     sender_key: str
     type: str = 'group'

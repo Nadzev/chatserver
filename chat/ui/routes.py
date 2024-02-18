@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import APIRouter, HTTPException, status
 
 from chat.domain.entities.users import User
-from chat.dtos.user import UserLogin, UpdatePublicKey
+from chat.dtos.user import UserLogin, UpdatePublicKey, SidUpdate
 from chat.service.message_service import SessionHandler
 from chat.service.user_service import UserService
 from chat.domain.entities.group import (
@@ -35,8 +35,7 @@ async def get_pk(user_id: str):
 async def update_public_key(public_key_data: UpdatePublicKey):
     user_id = public_key_data.user_id
     public_key = public_key_data.public_key
-    sid = public_key_data.sid
-    return await UserService.update_public_key(user_id, public_key, sid)
+    return await UserService.update_public_key(user_id, public_key)
 
 
 @router.get("/history/{session_id}")
@@ -48,15 +47,20 @@ async def get_history(session_id: str):
 
 @router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    username = form_data.username
-    password = form_data.password
-    user = UserLogin(username, password)
-    return await UserService.login(user)
+    username = form_data.username.lstrip()
+    password = form_data.password.lstrip()
+    result = await UserService.login(username, password)
+    return result
 
 
-@router.put("/")
-async def update_sid(sid: str, username):
-    await UserService.update_sid(username, sid)
+@router.put("/sid/{user_id}")
+async def update_sid(data:SidUpdate):
+    print(data)
+    sid = data.sid
+    print(sid)
+    user_id = data.user_id
+    print(user_id)
+    await UserService.update_sid(sid=sid, user_id=user_id)
 
 
 @router.post("/groups", response_model=Group, status_code=status.HTTP_201_CREATED)
@@ -67,11 +71,19 @@ async def create_group(group_create_request: GroupCreateRequest):
     - **group_name**: each group must have a name
     - **members**: list of user IDs to be included in the group
     """
-    print("Creating group %s")
     new_group = await GroupService.create_group(group_name=group_create_request.group_name, members=group_create_request.members, session_id=group_create_request.session_id)
     return new_group
 
+@router.get("/get-groups/{user_id}")
+async def get_groups(user_id:str):
+    groups = await GroupService.get_groups_for_user(user_id)
+    print(groups)
+    return groups
+
+
 @router.get("/group-public-keys/{group_id}")
 async def get_public_keys_from_group(group_id: str):
+    keys = await GroupService.get_public_keys(group_id)
+    print(keys)
     return await GroupService.get_public_keys(group_id)
 

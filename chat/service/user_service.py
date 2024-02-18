@@ -26,10 +26,11 @@ class UserService:
         return None
 
     @staticmethod
-    async def authenticate_user(student, password):
+    async def authenticate_user(sent_password, retrieved_password):
         response = AuthenticationSettings.pwd_context.verify(
-            password, student["password"]
+            sent_password, retrieved_password
         )
+        print(response)
         return response
 
     @staticmethod
@@ -37,18 +38,16 @@ class UserService:
         return UserRepository.get_user_by_username(username)
 
     @classmethod
-    async def login(cls, user: User):
-        username = user.username
+    async def login(cls, username:str, password:str):
         user = UserRepository.get_user_by_username(username)
-
-        if user is None or not await cls.authenticate_user(user, user.password):
+        if user is None or not await cls.authenticate_user(password, user['password']):
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
         access_token_expires = timedelta(
             minutes=AuthenticationSettings.access_token_expire_minutos
         )
         access_token = create_access_token(
-            data={"sub": user["email"]}, expires_delta=access_token_expires
+            data={"sub": user["username"]}, expires_delta=access_token_expires
         )
         return {"access_token": access_token, "token_type": "bearer"}
 
@@ -72,12 +71,12 @@ class UserService:
         return user
 
     @classmethod
-    async def update_sid(cls, username, sid):
-        UserRepository.update_sid(username, sid)
+    async def update_sid(cls, user_id, sid):
+        UserRepository.update_sid(user_id, sid)
 
     @classmethod
-    async def update_public_key(cls, user_id, public_key, sid):
-        UserRepository.update_public_key(user_id, public_key, sid)
+    async def update_public_key(cls, user_id, public_key):
+        UserRepository.update_public_key(user_id, public_key)
 
     @classmethod
     async def list_users(cls) -> List[dict]:
@@ -94,4 +93,6 @@ class UserService:
         """
         user_without_id = user.copy()
         user_without_id.pop("_id", None)
+        user_without_id.pop("password", None)
+
         return user_without_id

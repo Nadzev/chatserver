@@ -27,7 +27,7 @@ class GroupRepository:
         """
         Retrieve a group by its unique ID.
         """
-        return cls.collection.find_one({"group_id": group_id})
+        return cls.collection.find_one({"id_": group_id})
 
     @classmethod
     def add_member_to_group(cls, group_id: str, user_id: str):
@@ -60,6 +60,19 @@ class GroupRepository:
         Delete a group by its ID.
         """
         cls.collection.delete_one({"group_id": group_id})
+
+    @classmethod
+    def get_groups_by_member_id(cls, user_id: str) -> List[Group]:
+        """
+        Retrieve all groups that a specific user participates in.
+        
+        :param user_id: The unique ID of the user.
+        :return: A list of Group entities where the user is a member.
+        """
+        groups = cls.collection.find({"members": user_id})
+        # return [Group(**group) for group in groups]
+        return list(groups)
+
 
     @classmethod
     def update_group_name(cls, group_id: str, new_name: str):

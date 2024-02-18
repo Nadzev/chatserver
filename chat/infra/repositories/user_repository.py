@@ -26,21 +26,16 @@ class UserRepository(UserRepositoryInterface):
     def list_users(cls):
         return cls.collection.find()
 
-    # @classmethod
-    # def add_user(cls, user):
-    #     cls.collection.insert_one(user)
-    #     return user
 
     @classmethod
-    def update_sid(cls, username, sid):
-        cls.collection.update_one({"username": username}, {"$set": {"sid": sid}})
+    def update_sid(cls, user_id:str, sid:str):
+        cls.collection.update_one({"id_": user_id}, {"$set": {"sid": sid}})
 
     @classmethod
-    def update_public_key(cls, user_id, public_key, sid):
+    def update_public_key(cls, user_id, public_key):
         cls.collection.update_one(
             {"id_": user_id}, {"$set": {"public_key": public_key}}
         )
-        cls.collection.update_one({"id_": user_id}, {"$set": {"sid": sid}})
 
     @classmethod
     def delete_user(cls, user_id):

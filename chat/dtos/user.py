@@ -11,9 +11,12 @@ class User(BaseModel):
 class UpdatePublicKey(BaseModel):
     user_id: str
     public_key: Dict
-    sid: str
 
 
 class UserLogin(BaseModel):
     username: str
     password: str
+
+class SidUpdate(BaseModel):
+    user_id:str = None
+    sid: str = None

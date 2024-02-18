@@ -25,15 +25,16 @@ class GroupService:
     
     @classmethod
     async def get_public_keys(cls, group_id: str):
-        group = cls.get_group(group_id)
+        group = await cls.get_group(group_id)
         members = group['members']
         pair_members = {}
         pair_members['group_id'] = group_id
         pair_members['keys'] = {}
         for member in members:
-            user = await UserRepository.get_user_by_id(member)
+            user = UserRepository.get_user_by_id(member)
             public_key = user['public_key']
-            pair_members['keys'][user] = public_key
+            user_id = user['id_']  # Assuming 'id' is the attribute you can use as a unique identifier for the user
+            pair_members['keys'][user_id] = public_key
 
         return pair_members
 
@@ -67,6 +68,7 @@ class GroupService:
         :param group_id: ID of the group to retrieve.
         :return: The Group object.
         """
+        # print(GroupRepository.get_group_by_id(group_id))
         return GroupRepository.get_group_by_id(group_id)
 
     @classmethod
@@ -77,6 +79,13 @@ class GroupService:
         :return: A list of all Group objects.
         """
         groups = GroupRepository.list_groups()
+        converted_users = [cls.remove_id_field(group) for group in groups]
+
+        return converted_users
+    
+    @classmethod
+    async def get_groups_for_user(cls, user_id):
+        groups = GroupRepository.get_groups_by_member_id(user_id)
         converted_users = [cls.remove_id_field(group) for group in groups]
 
         return converted_users

@@ -6,3 +6,7 @@ class Message(BaseModel):
     sender: str
     receiver: str
     sender_key: str
+    session_id: str
+    recipient_sid: str
+    key: str
+

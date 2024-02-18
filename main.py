@@ -13,7 +13,7 @@ from chat.ui.routes import router
 from chat.service.message_service import SessionHandler
 from chat.service.user_service import UserService
 from chat.service.group_service import GroupService
-
+from pprint import pprint
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
 app = FastAPI()
 app.include_router(router)
@@ -35,8 +35,11 @@ async def connect(sid, *args):
     users = await UserService.list_users()
     groups = await GroupService.list_groups()
     users.extend(groups)
-    print(users)
+    print("######################## Sending ###############")
+    pprint(users)
     await sio.emit("usersList", users)
+
+
 
 @sio.event
 async def disconnect(sid):
@@ -47,17 +50,6 @@ async def disconnect(sid):
 async def update_sid(sid, data):
     await UserService.update_sid(data, sid)
 
-
-# @sio.event
-# async def message(sid, data):
-#     # data should contain 'recipient_id' and 'text
-#     message = await SessionHandler.get_message(data, sid)
-#     recipient = str(data["to"])
-#     receiver_sid = await SessionHandler.get_sid_user(recipient)
-#     await SessionHandler.add_message(data)
-#     print("Sending message to " + receiver_sid)
-#     await sio.emit("clientMessage", [message], to=receiver_sid)
-#     print("Message sent to " + receiver_sid)
 
 @sio.event
 async def send_group_message(sid, data):
@@ -79,26 +71,24 @@ async def send_group_message(sid, data):
 async def message(sid, data):
     # Check if the message is for a group
     is_group = data.get('is_group_message')
-
     if is_group:
         group_id = data['group_id']
+        print("Sending to group %s" % group_id)
         # Retrieve group members and their public keys
-        group_members = await GroupService.get_group(group_id).members
-        # Encrypt the symmetric key for each member and send the message
-        await SessionHandler.add_message(data)
-        # message = {
-        #     "encrypted_message":data['text'],
-
-        # }
-        for member in group_members:
+        group_members = await GroupService.get_group(group_id)
+        members = group_members['members']
+                # Encrypt the symmetric key for each member and send the message
+        await SessionHandler.add_group_message(data)
+        for member in members:
+            if member != data.get('from'):
             # Prepare the message payload with the encrypted message and symmetric key
-            receiver_sid = await SessionHandler.get_sid_user(member.id)
-            print(f"Sending group message to {receiver_sid}")
-            await sio.emit("groupMessage", data, to=receiver_sid)
+                receiver_sid = await SessionHandler.get_sid_user(member)
+                print(f"Sending group message to {receiver_sid}")
+                await sio.emit("groupMessage", [data], to=receiver_sid)
         
     else:
         # Handle direct messages as before
-        recipient = str(data["to"])
+        recipient = str(data.get("to"))
         message = await SessionHandler.get_message(data, sid)
         receiver_sid = await SessionHandler.get_sid_user(recipient)
         await SessionHandler.add_message(data)
